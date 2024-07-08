@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "./server";
 
-export const nonAuthedEligibleRoutes = ["/login", "/error", "/"];
+export const nonAuthedEligibleRoutes = ["/login", "/error", "/auth"];
 
-export async function getAuthedUserId() {
+export async function getAuthedUser() {
   const supabase = createClient();
 
   const { data, error } = await supabase.auth.getUser();
@@ -11,5 +11,5 @@ export async function getAuthedUserId() {
     redirect("/login");
   }
 
-  return data.user.id;
+  return data.user;
 }

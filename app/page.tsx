@@ -1,17 +1,55 @@
-import { getAuthedUserId } from "@/utils/supabase/helpers";
+import { getAuthedUser } from "@/utils/supabase/helpers";
 import { createClient } from "@/utils/supabase/server";
-import Image from "next/image";
 import Link from "next/link";
 
 export default async function Home() {
   const supabase = createClient();
 
-  const userId = await getAuthedUserId();
+  const { id: userId } = await getAuthedUser();
+
+  let existingUserGroupsElement = null;
 
   const groupUsers = await supabase
     .from("groupUser")
     .select()
-    .eq("userId", userId);
+    .eq("user_id", userId)
+    .not("admin_at", "is", null);
+
+  if (groupUsers.error) {
+    console.error("Error fetching groups for user");
+  }
+
+  if (groupUsers?.data && groupUsers.data.length !== 0) {
+    const groups = await supabase
+      .from("group")
+      .select("name")
+      .in(
+        "id",
+        groupUsers.data.map((groupUser) => groupUser.group_id)
+      );
+
+    if (groups.data) {
+      existingUserGroupsElement = groupUsers.data.map((groupUser, idx) => {
+        return (
+          <Link
+            href={`group/${groupUser.group_id}`}
+            className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+            key={`group-${idx}`}
+          >
+            <h2 className="mb-3 text-2xl font-semibold">
+              {groups.data[idx].name}{" "}
+              <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
+                -&gt;
+              </span>
+            </h2>
+            <p className="m-0 max-w-[30ch] text-sm opacity-50">
+              Update availabilities or preferences
+            </p>
+          </Link>
+        );
+      });
+    }
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -30,40 +68,7 @@ export default async function Home() {
             Set up a group to put together a schedule of responsibilities
           </p>
         </Link>
-
-        {/* <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a> */}
+        {existingUserGroupsElement}
       </div>
     </main>
   );
