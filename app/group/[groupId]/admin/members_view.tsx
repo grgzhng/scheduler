@@ -8,7 +8,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -17,7 +17,7 @@ import { createClient } from "@/utils/supabase/client";
 
 export function MembersView({
   groupUsers,
-  group,
+  group
 }: {
   groupUsers: any[];
   group: any;
@@ -46,7 +46,7 @@ export function MembersView({
               const groupUsersToInsert = emailsToAdd.map((email) => {
                 return {
                   group_id: group.id,
-                  email: email,
+                  email: email
                 };
               });
               const query = supabase

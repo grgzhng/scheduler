@@ -8,7 +8,7 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,19 +20,19 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from "@/components/ui/table";
 import { createClient } from "@/utils/supabase/client";
 
 enum View {
   MEMBERS,
   ROLES,
-  SCHEDULES,
+  SCHEDULES
 }
 
 export function AdminView({
   groupUsers,
-  group,
+  group
 }: {
   groupUsers: any[];
   group: any;
@@ -51,7 +51,7 @@ export function AdminView({
   return (
     <div>
       <div className="flex flex-row">
-        <div onClick={() => setView(View.MEMBERS)}>Users</div>
+        <div onClick={() => setView(View.MEMBERS)}>Members</div>
         <div onClick={() => setView(View.ROLES)}>Roles</div>
         <div onClick={() => setView(View.SCHEDULES)}>Schedules</div>
       </div>
@@ -120,7 +120,7 @@ export function AdminView({
                   const newRoles = [...roles];
                   newRoles.push({
                     name: roleInputRef.current.value,
-                    description: roleDescriptionInputRef.current.value,
+                    description: roleDescriptionInputRef.current.value
                   });
                   console.log({ newRoles });
 

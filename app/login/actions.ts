@@ -8,16 +8,17 @@ import { createClient } from "@/utils/supabase/server";
 export async function login(formData: FormData) {
   const supabase = createClient();
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const email = formData.get("email") as string;
+  const email = formData.get("email");
+
+  if (typeof email !== "string") {
+    throw new Error("Invalid input");
+  }
 
   const { error } = await supabase.auth.signInWithOtp({
     email: email,
     options: {
-      // set this to false if you do not want the user to be automatically signed up
-      shouldCreateUser: false,
-    },
+      shouldCreateUser: false
+    }
   });
 
   console.warn(error);
@@ -33,15 +34,21 @@ export async function login(formData: FormData) {
 export async function signup(formData: FormData) {
   const supabase = createClient();
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const email = formData.get("email") as string;
+  const email = formData.get("email");
+  const name = formData.get("name");
+
+  if (typeof email !== "string" || typeof name !== "string") {
+    throw new Error("Invalid input");
+  }
 
   const { error } = await supabase.auth.signInWithOtp({
     email: email,
     options: {
       shouldCreateUser: true,
-    },
+      data: {
+        name: name
+      }
+    }
   });
 
   if (error) {

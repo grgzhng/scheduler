@@ -17,13 +17,24 @@ export async function GET(request: NextRequest) {
   if (token_hash && type) {
     const supabase = createClient();
 
-    const { error } = await supabase.auth.verifyOtp({
+    const {
+      error,
+      data: { user }
+    } = await supabase.auth.verifyOtp({
       type,
-      token_hash,
+      token_hash
     });
     if (!error) {
       redirectTo.searchParams.delete("next");
       return NextResponse.redirect(redirectTo);
+    }
+
+    // If the user's email corresponds to any group users, attach their user_id to those group users
+    if (user && user.email) {
+      supabase
+        .from("groupUser")
+        .update({ user_id: user.id })
+        .eq("email", user.email);
     }
   }
 

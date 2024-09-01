@@ -4,12 +4,6 @@ import { getAuthedUser } from "@/utils/supabase/helpers";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
-type Group = {
-  id: number;
-  name: string;
-  created_at: Date;
-};
-
 export async function createGroup(formData: FormData) {
   const supabase = createClient();
   const user = await getAuthedUser();
@@ -22,7 +16,7 @@ export async function createGroup(formData: FormData) {
     .from("group")
     .insert({
       name: name,
-      admin_id: user.id,
+      admin_id: user.id
     })
     .select();
 
@@ -32,12 +26,14 @@ export async function createGroup(formData: FormData) {
 
   const createdGroupId = query.data[0].id;
 
-  await supabase.from("groupUser").insert({
-    group_id: createdGroupId,
-    user_id: user.id,
-    email: user.email,
-    admin_at: new Date(),
-  });
+  if (user.email != null) {
+    await supabase.from("groupUser").insert({
+      group_id: createdGroupId,
+      email: user.email,
+      user_id: user.id,
+      admin_at: new Date().toISOString()
+    });
+  }
 
   redirect(`/group/${createdGroupId}`);
 }
